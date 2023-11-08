@@ -1,0 +1,116 @@
+<div class="w-screen h-screen flex items-start justify-center">
+    <div class="flex flex-col gap-8 mt-40">
+        <h1 class="text-4xl font-bold text-gray-800">Audio Processing Tool</h1>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4 bg-green-800 w-fit rounded-full py-1 px-3 text-white"
+                *ngIf="microphonePermissionState === 'granted'">
+                <svg class="h-5 w-5" fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512">
+                    <path
+                        d="M256 512a256 256 0 1 0 0-512 256 256 0 1 0 0 512zm113-303L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z">
+                    </path>
+                </svg>
+                <p class="text-sm font-medium">Has microphone permission</p>
+            </div>
+            <div class="animate-pulse flex items-center gap-4 bg-red-800 w-fit rounded-full py-1 px-3 text-white"
+                *ngIf="microphonePermissionState === 'granted' && isRecording">
+                <svg class="h-5 w-5" fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16">
+                    <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                    <path fill-rule="evenodd"
+                        d="M8.6 1c1.6.1 3.1.9 4.2 2 1.3 1.4 2 3.1 2 5.1 0 1.6-.6 3.1-1.6 4.4-1 1.2-2.4 2.1-4 2.4-1.6.3-3.2.1-4.6-.7-1.4-.8-2.5-2-3.1-3.5C.9 9.2.8 7.5 1.3 6c.5-1.6 1.4-2.9 2.8-3.8C5.4 1.3 7 .9 8.6 1zm.5 12.9c1.3-.3 2.5-1 3.4-2.1.8-1.1 1.3-2.4 1.2-3.8 0-1.6-.6-3.2-1.7-4.3-1-1-2.2-1.6-3.6-1.7-1.3-.1-2.7.2-3.8 1-1.1.8-1.9 1.9-2.3 3.3-.4 1.3-.4 2.7.2 4 .6 1.3 1.5 2.3 2.7 3 1.2.7 2.6.9 3.9.6z">
+                    </path>
+                </svg>
+                <p class="text-sm font-medium">Recording</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 bg-red-800 w-fit rounded-full py-1 px-3 text-white"
+            *ngIf="microphonePermissionState === 'prompt'">
+            <svg class="h-5 w-5" fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512">
+                <path
+                    d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208 208-93.31 208-208S370.69 48 256 48Zm75.31 260.69a16 16 0 1 1-22.62 22.62L256 278.63l-52.69 52.68a16 16 0 0 1-22.62-22.62L233.37 256l-52.68-52.69a16 16 0 0 1 22.62-22.62L256 233.37l52.69-52.68a16 16 0 0 1 22.62 22.62L278.63 256Z">
+                </path>
+            </svg>
+            <p class="text-sm font-medium">Does not have microphone permission yet</p>
+        </div>
+        <div class="flex items-center gap-4 bg-red-800 w-fit rounded-full py-1 px-3 text-white"
+            *ngIf="microphonePermissionState === 'denied'">
+            <svg class="h-5 w-5" fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512">
+                <path
+                    d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208 208-93.31 208-208S370.69 48 256 48Zm75.31 260.69a16 16 0 1 1-22.62 22.62L256 278.63l-52.69 52.68a16 16 0 0 1-22.62-22.62L233.37 256l-52.68-52.69a16 16 0 0 1 22.62-22.62L256 233.37l52.69-52.68a16 16 0 0 1 22.62 22.62L278.63 256Z">
+                </path>
+            </svg>
+            <p class="text-sm font-medium">User declined permission</p>
+        </div>
+
+        <button type="button"
+            class="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+            *ngIf="microphonePermissionState === 'granted' && !isRecording"
+            (click)="handleClickStartRecord()">Record</button>
+        <button type="button"
+            class="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+            *ngIf="microphonePermissionState === 'granted' && isRecording"
+            (click)="handleClickStopRecord()">Stop</button>
+        <button type="button"
+            class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+            *ngIf="microphonePermissionState === 'prompt'" (click)="handleRequestPermission()">Request
+            permission</button>
+
+        <div class="space-y-4 mt-8" *ngIf="microphonePermissionState === 'granted'">
+            <h3 class="text-md font-semibold text-gray-800">Devices</h3>
+            <ng-container *ngFor="let audioDevice of availableAudioDevices">
+                <label
+                    class="relative block cursor-pointer rounded-lg border bg-white px-6 py-4 shadow-sm focus:outline-none sm:flex sm:justify-between"
+                    [ngClass]="{'border-indigo-600 ring-2 ring-indigo-600': selectedAudioDevice === audioDevice.id}"
+                    (click)="handleClickSelectAudioDevice(audioDevice.id)">
+                    <span class="flex items-center">
+                        <span class="flex flex-col text-sm">
+                            <span class="font-medium text-gray-900">{{ audioDevice.name }}</span>
+                            <span class="text-gray-500">
+                                <span class="block sm:inline text-xs">{{ audioDevice.id }}</span>
+                            </span>
+                        </span>
+                    </span>
+                    <span class="pointer-events-none absolute -inset-px rounded-lg border-2" aria-hidden="true"></span>
+                </label>
+            </ng-container>
+        </div>
+
+        <div class="space-y-4 mt-8" *ngIf="savedAudios.length > 0">
+            <h3 class="text-md font-semibold text-gray-800">Audios</h3>
+            <ul role="list"
+                class="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+                <ng-container *ngFor="let audio of savedAudios; let audioIndex = index">
+                    <li class="relative flex justify-between items-center gap-x-6 px-4 py-2 sm:px-6">
+                        <div class="flex gap-x-4 items-center gap-8">
+                            <svg class="h-4 w-4 text-red-500 cursor-pointer" fill="currentColor" stroke-width="0"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+                                (click)="handleDeleteAudio(audioIndex)">
+                                <path
+                                    d="M135.2 17.7 128 32H32C14.3 32 0 46.3 0 64s14.3 32 32 32h384c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32l21.2 339c1.6 25.3 22.6 45 47.9 45h245.8c25.3 0 46.3-19.7 47.9-45L416 128z">
+                                </path>
+                            </svg>
+                            <div class="min-w-0 flex-auto">
+                                <p class="text-sm font-semibold leading-6 text-gray-900">{{ 'Audio ' + (audioIndex + 1)
+                                    }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-x-4">
+                            <div class="hidden sm:flex sm:flex-col sm:items-end">
+                                <audio [src]="getAudioRef(audioIndex)" controls></audio>
+                            </div>
+                            <svg class="cursor-pointer h-5 w-5 flex-none text-gray-400" fill="none" stroke-width="2"
+                                stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"
+                                (click)="handleDownloadAudio(audioIndex)">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                            </svg>
+                        </div>
+                    </li>
+                </ng-container>
+            </ul>
+        </div>
+    </div>
+</div>
